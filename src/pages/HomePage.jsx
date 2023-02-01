@@ -30,7 +30,7 @@ export const HomePage = () => {
       <TextCard stringValue={inputString} stringIndex = {currentStringIndex} />
       <CancelButton stringValue={nameCancelButton}/>
       <ReworkButton stringValue={nameReworkButton}/>
-      <AcceptButton stringValue={nameAcceptButton}/>
+      <AcceptButton stringValue={nameAcceptButton} state = {[currentStringIndex, setNextString, inputString.length]} />
     </>
   );
 }
