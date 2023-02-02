@@ -1,5 +1,9 @@
 #root {
-  max-width: 100%;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;

@@ -1,12 +1,8 @@
-import React from 'react';
-import { Button } from '../Button/'
+import React from "react";
+import { Button } from "../Button/";
 
-import './rework-button.css'
+import "./rework-button.css";
 
-export const ReworkButton = ({ stringValue }) => {
-  
-  return (
-    <Button nameButton = {stringValue} />
-    
-  )
+export const ReworkButton = ({ children }) => {
+  return <Button>{children}</Button>;
 };
