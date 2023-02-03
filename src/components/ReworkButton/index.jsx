@@ -3,6 +3,79 @@ import { Button } from "../Button/";
 
 import "./rework-button.css";
 
+const preProcessedText = [
+  "у меня были попытки культивировать кокаиновый куст, не могу сказать, что это получилось, но теперь я знаю, на что обращать внимание при следующем культивировании",
+  "чтобы вырастить коноплю, надо купить хорошую почву на торфяной или гумусовой основе, желательно, не очень щелочные, но чтоб было много азота, фосфора и кальция",
+  "чтобы у тебя хороший урожай конопли был,  надо обязательно выдерживать долгий световой режим",
+  "за кактусами вообще уход сложный, особенно если они мескалин содержат, там очень важно соблюдать правильный полив, а то растение не будет давать такой забойный эффект",
+];
+
+const requestText = `Вариант текста другими словами 1: "у меня были попытки культивировать кокаиновый куст, не могу сказать, что это получилось, но теперь я знаю, на что обращать внимание при следующем культивировании"
+
+Вариант текста другими словами 2: "чтобы вырастить коноплю, надо купить хорошую почву на торфяной или гумусовой основе, желательно, не очень щелочные, но чтоб было много азота, фосфора и кальция"
+
+Вариант текста другими словами 3: "чтобы у тебя хороший урожай конопли был,  надо обязательно выдерживать долгий световой режим"
+
+Вариант текста другими словами 4: "за кактусами вообще уход сложный, особенно если они мескалин содержат, там очень важно соблюдать правильный полив, а то растение не будет давать такой забойный эффект"`;
+const getEditedText = (text) => {
+  const editedString = text
+    .split("\n\n")
+    .filter((x) => !!x)[0]
+    .replace(new RegExp(/Вариант текста другими словами 5:/), "");
+  return editedString;
+};
+
+const getReadyText = (textForProcessed) => {
+  let readyString = textForProcessed.reduce((prev, current, index) => {
+    return `${prev}\n\nВариант текста другими словами ${
+      index + 1
+    }: "${current}"`;
+  }, "");
+
+  return readyString;
+};
+
+async function postData(url = "", data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, *cors, same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(data), // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
 export const ReworkButton = ({ children }) => {
-  return <Button>{children}</Button>;
+  const getRandomStrings = () => {
+    const prefix = "Вариант текста другими словами";
+    const temp = 0.9;
+    const length = 50;
+
+    const promisePostData = postData(
+      "https://meta.ml.ocas.ai/model/gpt3large/generate",
+      {
+        text: getReadyText(preProcessedText),
+        config: {
+          temperature: temp,
+          length: length,
+        },
+      }
+    );
+    promisePostData.then((data) => {
+      console.log(data);
+      console.log(data.text);
+      // edited = getEditedText(data.text);
+      // console.log(edited);
+    });
+  };
+
+  return <Button clickFunction={getRandomStrings}>{children}</Button>;
 };
