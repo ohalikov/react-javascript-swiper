@@ -5,13 +5,11 @@ import "./accept-button.css";
 
 export const AcceptButton = ({ children, state }) => {
   const handleClick = () => {
-    const [index, setState, lenght] = state;
-    console.log("here_Accept");
-    console.log(index);
-    if (index <= lenght) {
-      setState(index + 1);
-    } else console.log("кончились");
-    // setState(currentIndex + 1);
+    const [nextString, setString, nextDataFetch] = state;
+    console.log(`"nextstring -> ", ${nextString}`);
+
+    setString(nextString);
+    nextDataFetch();
   };
   return (
     <Button classNameButton={"accpet-button"} clickFunction={handleClick}>

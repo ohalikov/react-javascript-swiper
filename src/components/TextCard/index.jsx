@@ -3,18 +3,23 @@ import React from "react";
 
 import "./text-card.css";
 
-export const TextCard = ({ stringValue, stringIndex }) => {
+export const TextCard = ({ stringIndex, textCard }) => {
+  const handleChange = () => {
+    // console.log(textCard);
+  };
+
   return (
     <div className="card_block">
       {
-        <h1 key={stringIndex} className="input-string__card_block">
-          {stringValue[stringIndex]}
-        </h1>
-        // stringValue.map((element, index)=>(
-        //   <h1 key={index} className='input-string__card_block'>
-        //     {element}
-        //   </h1>
-        // ))
+        <form action="" method="post" className="form__card_block">
+          <textarea
+            key={textCard}
+            type="text"
+            className="input-string__card_block"
+            value={textCard ? textCard : "loading..."}
+            onChange={handleChange}
+          ></textarea>
+        </form>
       }
     </div>
   );

@@ -41,22 +41,22 @@ export const ReworkButton = ({ children }) => {
     const temp = 0.9;
     const length = 50;
 
-    const promisePostData = postData(
-      "https://meta.ml.ocas.ai/model/gpt3large/generate",
-      {
-        text: getReadyText(preProcessedText),
-        config: {
-          temperature: temp,
-          length: length,
-        },
-      }
-    );
-    promisePostData.then((data) => {
-      console.log(data);
-      console.log(data.text);
-      // edited = getEditedText(data.text);
-      // console.log(edited);
-    });
+    // const promisePostData = postData(
+    //   "https://meta.ml.ocas.ai/model/gpt3large/generate",
+    //   {
+    //     text: getReadyText(preProcessedText),
+    //     config: {
+    //       temperature: temp,
+    //       length: length,
+    //     },
+    //   }
+    // );
+    // promisePostData.then((data) => {
+    //   console.log(data);
+    //   console.log(data.text);
+    //   // edited = getEditedText(data.text);
+    //   // console.log(edited);
+    // });
   };
 
   return <Button clickFunction={getRandomStrings}>{children}</Button>;

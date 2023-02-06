@@ -5,9 +5,9 @@ import { AcceptButton } from "../components/AcceptButton";
 import { CancelButton } from "../components/CancelButton";
 import { ReworkButton } from "../components/ReworkButton";
 
-import { postData } from "./api.js";
+import { fetchData } from "../api/api.js";
 
-const inputString = [
+const defaultString = [
   "Дети, которые совершают насилие над собой совершают преступление",
   "Не дети, совершают насилие",
   "asdfsadfsa",
@@ -23,7 +23,18 @@ const preProcessedText = [
   "за кактусами вообще уход сложный, особенно если они мескалин содержат, там очень важно соблюдать правильный полив, а то растение не будет давать такой забойный эффект",
 ];
 
-const getReadyText = (textForProcessed) => {
+const temp = 0.9;
+const length = 50;
+
+const executeNormalText = (text) => {
+  const editedString = text
+    .split("\n\n")
+    .filter((x) => !!x)[0]
+    .replace(new RegExp(/Вариант текста другими словами 5:/), "");
+  return editedString;
+};
+
+const getEditedText = (textForProcessed) => {
   let readyString = textForProcessed.reduce((prev, current, index) => {
     return `${prev}\n\nВариант текста другими словами ${
       index + 1
@@ -36,35 +47,70 @@ const getReadyText = (textForProcessed) => {
 const defualtParams = {
   url: "https://meta.ml.ocas.ai/model/gpt3large/generate",
   prefix: "Вариант текста другими словами",
-  temp: 0.9,
-  length: 50,
   data: {
-    text: getReadyText(preProcessedText),
+    text: getEditedText(preProcessedText),
     config: {
-      temperature: this.temp,
-      length: this.length,
+      temperature: temp,
+      length: length,
     },
   },
 };
 
+// console.log(defualtParams);
+
 export const HomePage = () => {
-  const [currentStringIndex, setNextString] = useState(0);
+  const [currentGenerationString, setString] = useState("");
+  const [nextString, setNextString] = useState("");
+
+  const getString = async () => {
+    const data = await fetchData(defualtParams.url, defualtParams.data);
+    const edited = executeNormalText(data.text);
+    return edited;
+  };
+
+  const nextDataFetch = async () => {
+    let noEmptyString = "";
+    let data = "";
+    while (!noEmptyString) {
+      data = await getString();
+      console.log(`next data -> ${data}`);
+      data.replace("\n", "") ? (noEmptyString = true) : false;
+    }
+    setNextString(data);
+  };
+
+  const dataFetch = async () => {
+    let noEmptyString = "";
+    let data = "";
+    while (!noEmptyString) {
+      data = await getString();
+      console.log(`current data -> ${data}`);
+      data.replace("\n", "") ? (noEmptyString = true) : false;
+    }
+    setString(data);
+  };
+
   useEffect(() => {
-    effect;
+    let ignore = false;
     return () => {
-      cleanup;
+      if (!ignore) {
+        dataFetch();
+        nextDataFetch();
+      }
+      ignore = true;
     };
-  }, [input]);
-  console.log(currentStringIndex);
+  }, []);
+
   return (
     <>
       <p className="label-string__card_block">Входная строка:</p>
-      <TextCard stringValue={inputString} stringIndex={currentStringIndex} />
+      <TextCard
+        stringValue={defaultString}
+        textCard={currentGenerationString}
+      />
       <CancelButton>{nameCancelButton}</CancelButton>
       <ReworkButton>{nameReworkButton}</ReworkButton>
-      <AcceptButton
-        state={[currentStringIndex, setNextString, inputString.length]}
-      >
+      <AcceptButton state={[nextString, setString, nextDataFetch]}>
         {nameAcceptButton}
       </AcceptButton>
     </>
