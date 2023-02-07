@@ -59,5 +59,5 @@ export const ReworkButton = ({ children }) => {
     // });
   };
 
-  return <Button clickFunction={getRandomStrings}>{children}</Button>;
+  return <Button onClick={getRandomStrings}>{children}</Button>;
 };

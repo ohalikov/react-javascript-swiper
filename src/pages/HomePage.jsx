@@ -6,12 +6,10 @@ import { CancelButton } from "../components/CancelButton";
 import { ReworkButton } from "../components/ReworkButton";
 
 import { fetchData } from "../api/api.js";
+import { useQuery } from "@tanstack/react-query";
 
-const defaultString = [
-  "Дети, которые совершают насилие над собой совершают преступление",
-  "Не дети, совершают насилие",
-  "asdfsadfsa",
-];
+let renderCount = 0;
+
 const nameAcceptButton = "Принять строку";
 const nameCancelButton = "Отклонить строку";
 const nameReworkButton = "Отправить на доработку";
@@ -30,7 +28,9 @@ const executeNormalText = (text) => {
   const editedString = text
     .split("\n\n")
     .filter((x) => !!x)[0]
-    .replace(new RegExp(/Вариант текста другими словами 5:/), "");
+    .replace(new RegExp(/Вариант текста другими словами 5:/), "")
+    .replaceAll('"', "")
+    .trim();
   return editedString;
 };
 
@@ -40,7 +40,6 @@ const getEditedText = (textForProcessed) => {
       index + 1
     }: "${current}"`;
   }, "");
-
   return readyString;
 };
 
@@ -55,58 +54,51 @@ const defualtParams = {
     },
   },
 };
+const getString = async () => {
+  const data = await fetchData(defualtParams.url, defualtParams.data);
+  const edited = executeNormalText(data.text);
+  return edited;
+};
 
-// console.log(defualtParams);
+const getNotEmptyData = async () => {
+  while (true) {
+    const data = await getString();
+    console.log(`next data -> ${data}`);
+    if (data.replace("\n", "")) return data;
+  }
+};
 
 export const HomePage = () => {
-  const [currentGenerationString, setString] = useState("");
-  const [nextString, setNextString] = useState("");
+  const { data: currentGenerationString } = useQuery(["string", "first"], {
+    queryFn: getNotEmptyData,
+  });
+  const { data: nextString } = useQuery(["string", "second"], {
+    queryFn: getNotEmptyData,
+  });
+  renderCount++;
+  const [, setString] = useState("");
+  const [, setNextString] = useState("");
+  const [changedString, setChangedString] = useState(null);
 
-  const getString = async () => {
-    const data = await fetchData(defualtParams.url, defualtParams.data);
-    const edited = executeNormalText(data.text);
-    return edited;
-  };
+  const nextDataFetch = async () => {};
 
-  const nextDataFetch = async () => {
-    let noEmptyString = "";
-    let data = "";
-    while (!noEmptyString) {
-      data = await getString();
-      console.log(`next data -> ${data}`);
-      data.replace("\n", "") ? (noEmptyString = true) : false;
-    }
-    setNextString(data);
-  };
-
-  const dataFetch = async () => {
-    let noEmptyString = "";
-    let data = "";
-    while (!noEmptyString) {
-      data = await getString();
-      console.log(`current data -> ${data}`);
-      data.replace("\n", "") ? (noEmptyString = true) : false;
-    }
-    setString(data);
-  };
-
-  useEffect(() => {
-    let ignore = false;
-    return () => {
-      if (!ignore) {
-        dataFetch();
-        nextDataFetch();
-      }
-      ignore = true;
-    };
-  }, []);
+  // useEffect(() => {
+  //   let ignore = false;
+  //   return () => {
+  //     if (!ignore) {
+  //       getNotEmptyData().then(setString);
+  //       getNotEmptyData().then(setNextString);
+  //     }
+  //     ignore = true;
+  //   };
+  // }, []);
 
   return (
     <>
-      <p className="label-string__card_block">Входная строка:</p>
+      <p className="label-string__card_block">Render Count: {renderCount}</p>
       <TextCard
-        stringValue={defaultString}
-        textCard={currentGenerationString}
+        text={changedString ? changedString : currentGenerationString}
+        rememberText={setChangedString}
       />
       <CancelButton>{nameCancelButton}</CancelButton>
       <ReworkButton>{nameReworkButton}</ReworkButton>

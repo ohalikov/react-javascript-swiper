@@ -1,16 +1,9 @@
 import React from "react";
 import "./button.css";
 
-const handleClick = () => {
-  console.log("here_standart button");
-};
-export const Button = ({
-  children,
-  classNameButton = "btn",
-  clickFunction = handleClick,
-}) => {
+export const Button = ({ children, classNameButton = "btn", onClick }) => {
   return (
-    <button className={classNameButton} onClick={clickFunction}>
+    <button className={classNameButton} onClick={onClick}>
       {children}
     </button>
   );

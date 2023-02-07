@@ -12,7 +12,7 @@ export const AcceptButton = ({ children, state }) => {
     nextDataFetch();
   };
   return (
-    <Button classNameButton={"accpet-button"} clickFunction={handleClick}>
+    <Button classNameButton={"accpet-button"} onClick={handleClick}>
       {children}
     </Button>
   );
