@@ -2,7 +2,10 @@ import { useState } from "react";
 import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HomePage } from "./pages/HomePage";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 const queryClient = new QueryClient();
+
 function App() {
   const [count, setCount] = useState(0);
 
@@ -10,6 +13,7 @@ function App() {
     <div className="App">
       <QueryClientProvider client={queryClient}>
         <HomePage />
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </div>
   );
