@@ -76,59 +76,82 @@ const queryToGetGenerationText = (nameDataReturn = "", nameQuery) => {
 
 export const HomePage = () => {
   const queryClient = useQueryClient();
-  const { data: currentGenerationString } = queryToGetGenerationText(
-    "ff2",
-    "first"
-  );
-  const { data: nextString } = queryToGetGenerationText("ff", "second");
-  // const { data: currentGenerationString, isLoading } = useQuery(
-  //   ["string", "first"],
-  //   {
-  //     queryFn: () => getNotEmptyData("1"),
-  //   }
-  // );
-  // const { data: nextString } = useQuery(["string", "second"], {
-  //   queryFn: () => getNotEmptyData("2"),
-  // });
-  renderCount++;
-  const [, setString] = useState("");
-  const [, setNextString] = useState("");
-  const [changedString, setChangedString] = useState(null);
-
-  const nextDataFetch = async () => {};
-
-  const mutation = useMutation((newString) => {
-    console.log(newString);
-    setChangedString(newString);
+  const [currentString, setCurrentString] = useState("");
+  const [futureString, setFutureString] = useState("");
+  const [changedText, setChangedText] = useState(""); // Change textarea
+  const [preventSaveText, setPreventSaveText] = useState("");
+  const [saveText, setSaveText] = useState("");
+  const [index, setIndex] = useState(0);
+  // REACT QUERY
+  const { data: firstQueryString, isLoading } = useQuery(["string", index], {
+    queryFn: () => getNotEmptyData("1"),
   });
-  // useEffect(() => {
-  //   let ignore = false;
-  //   return () => {
-  //     if (!ignore) {
-  //       getNotEmptyData().then(setString);
-  //       getNotEmptyData().then(setNextString);
-  //     }
-  //     ignore = true;
-  //   };
-  // }, []);
+  const { data: firstnextString, isLoading: isLoad2 } = useQuery(
+    ["string", index + 1],
+    {
+      queryFn: () => getNotEmptyData("2"),
+    }
+  );
 
+  renderCount++;
+
+  // MUTATION
+  const mutation = useMutation((newString) => {
+    setSaveText(newString);
+    setIndex((prevIndex) => prevIndex + 1);
+    // отправлять в localstorage
+    // getNotEmptyData("next string 1->");
+    // getNotEmptyData("next string 2->");
+  });
+
+  // SET CHANGES from textarea
+  const myOwnSubmit = (data) => {
+    setChangedText(data);
+    console.log(`watch->`, data);
+  };
+  if (isLoading) return <div>Loading...</div>;
   return (
     <>
       <p className="label-string__card_block">Render Count: {renderCount}</p>
+
       <TextCard
-        text={changedString ? changedString : currentGenerationString}
-        rememberText={setChangedString}
+        text={futureString ? futureString : firstQueryString}
+        // rememberText={setFutureString}
+        onSubmit={myOwnSubmit}
       />
+      <button onClick={() => setIndex((prev) => (prev === 0 ? 0 : prev - 1))}>
+        Back
+      </button>
       <CancelButton>{nameCancelButton}</CancelButton>
       <ReworkButton>{nameReworkButton}</ReworkButton>
       <button
+        disabled={isLoad2}
         onClick={() => {
-          mutation.mutate(nextString);
+          if (changedText === "") {
+            console.log("preventSaveText ->", preventSaveText);
+            // setSaveText(preventSaveText);
+          } else {
+            console.log("changedText->", changedText);
+            mutation.mutate(changedText?.textArea, {
+              onSuccess: () => {
+                console.log(`saveText-> ${saveText}`, saveText);
+              },
+            });
+            // getNotEmptyData("next string");
+            console.log(`saveText-> ${saveText}`, saveText);
+          }
         }}
       >
         принять!!!
       </button>
-      {/* <AcceptButton state={[nextString, setValueInForm, nextDataFetch]}>
+      <button
+        onClick={() =>
+          setIndex((prev) => (prev <= setIndex.length ? prev + 1 : prev))
+        }
+      >
+        Next
+      </button>
+      {/* <AcceptButton state={[nextString, setValueInForm, getNotEmptyData]}>
         {nameAcceptButton}
       </AcceptButton> */}
     </>
