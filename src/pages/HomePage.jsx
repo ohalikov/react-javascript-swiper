@@ -76,20 +76,20 @@ const queryToGetGenerationText = (nameDataReturn = "", nameQuery) => {
 
 export const HomePage = () => {
   const queryClient = useQueryClient();
-  const [currentString, setCurrentString] = useState("");
+  // const [currentString, setCurrentString] = useState("");
   const [futureString, setFutureString] = useState("");
   const [changedText, setChangedText] = useState(""); // Change textarea
   const [preventSaveText, setPreventSaveText] = useState("");
   const [saveText, setSaveText] = useState("");
   const [index, setIndex] = useState(0);
   // REACT QUERY
-  const { data: firstQueryString, isLoading } = useQuery(["string", index], {
-    queryFn: () => getNotEmptyData("1"),
+  const { data: currentString, isLoading } = useQuery(["string", index], {
+    queryFn: () => getNotEmptyData(index),
   });
   const { data: firstnextString, isLoading: isLoad2 } = useQuery(
     ["string", index + 1],
     {
-      queryFn: () => getNotEmptyData("2"),
+      queryFn: () => getNotEmptyData(index + 1),
     }
   );
 
@@ -115,9 +115,10 @@ export const HomePage = () => {
       <p className="label-string__card_block">Render Count: {renderCount}</p>
 
       <TextCard
-        text={futureString ? futureString : firstQueryString}
+        key={currentString}
+        text={currentString}
         // rememberText={setFutureString}
-        onSubmit={myOwnSubmit}
+        onSubmit={setChangedText}
       />
       <button onClick={() => setIndex((prev) => (prev === 0 ? 0 : prev - 1))}>
         Back
@@ -128,6 +129,7 @@ export const HomePage = () => {
         disabled={isLoad2}
         onClick={() => {
           if (changedText === "") {
+            console.log("firstQueryString ->", currentString);
             console.log("preventSaveText ->", preventSaveText);
             // setSaveText(preventSaveText);
           } else {

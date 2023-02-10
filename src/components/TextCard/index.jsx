@@ -10,7 +10,14 @@ export const TextCard = ({ text, onSubmit }) => {
   return (
     <div className="card_block">
       {
-        <form className="form__card_block" onChange={handleSubmit(onSubmit)}>
+        <form
+          className="form__card_block"
+          onChange={(e) => {
+            let changedText = e.target.value;
+            // console.log(changedText);
+            handleSubmit(onSubmit(changedText));
+          }}
+        >
           <textarea
             key={text}
             name="saveContent"
