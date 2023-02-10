@@ -86,7 +86,7 @@ export const HomePage = () => {
   const { data: currentString, isLoading } = useQuery(["string", index], {
     queryFn: () => getNotEmptyData(index),
   });
-  const { data: firstnextString, isLoading: isLoad2 } = useQuery(
+  const { data: nextString, isLoading: isLoad2 } = useQuery(
     ["string", index + 1],
     {
       queryFn: () => getNotEmptyData(index + 1),
@@ -117,6 +117,7 @@ export const HomePage = () => {
       <TextCard
         key={currentString}
         text={currentString}
+        futureText={nextString}
         // rememberText={setFutureString}
         onSubmit={setChangedText}
       />
